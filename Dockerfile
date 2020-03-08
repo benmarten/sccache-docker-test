@@ -13,7 +13,9 @@ WORKDIR $HOME/app
 ADD src src
 ADD Cargo.lock .
 ADD Cargo.toml .
-ADD build.sh .
 
-RUN chmod +x build.sh
-RUN --mount=type=cache,target=/home/root/.cache/sccache bash -x build.sh
+# Change this line to force docker recompilation from this step on.
+# This will hit sccache the second time.
+RUN echo 1
+
+RUN --mount=type=cache,target=/home/root/.cache/sccache cargo build --release && sccache --show-stats
