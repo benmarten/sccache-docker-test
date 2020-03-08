@@ -11,20 +11,9 @@ ENV RUSTC_WRAPPER="/usr/local/cargo/bin/sccache"
 WORKDIR $HOME/app
 
 ADD src src
-ADD Cargo.lock Cargo.lock
-ADD Cargo.toml Cargo.toml
+ADD Cargo.lock .
+ADD Cargo.toml .
+ADD build.sh .
 
-# Start sccache.
-RUN sccache --start-server
-RUN sccache --show-stats
-
-# Build & fill cache.
-RUN --mount=target=$HOME/.cache/sccache,rw \
-	cargo build
-RUN sccache --show-stats
-
-# Clear cargo cache & rebuild, using cache.
-RUN rm -rf target
-RUN --mount=target=$HOME/.cache/sccache,rw \
-	cargo build
-RUN sccache --show-stats
+RUN chmod +x build.sh
+RUN --mount=type=cache,target=/home/root/.cache/sccache bash -x build.sh
